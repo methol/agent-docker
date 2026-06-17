@@ -10,9 +10,21 @@ LABEL org.opencontainers.image.title="cc-docker" \
       org.opencontainers.image.source="https://github.com/methol/cc-docker" \
       org.opencontainers.image.version="${CC_VERSION}"
 
-# 1) plugin clone 依赖 git;ca-certificates/curl/bash 常备
+# 1) 基础工具:git + 常用开发工具
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        git curl ca-certificates bash \
+        git git-lfs \
+        curl wget ca-certificates bash \
+        openssh-client \
+        jq \
+        ripgrep \
+        fd-find \
+        tree \
+        make \
+        python3 python3-pip \
+        unzip \
+        less \
+        procps \
+    && ln -s /usr/bin/fdfind /usr/local/bin/fd \
     && rm -rf /var/lib/apt/lists/*
 
 # 2) 安装 Claude Code CLI(钉死到 CI 传入的版本,保证镜像内版本 = 镜像 tag)
