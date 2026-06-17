@@ -2,13 +2,21 @@
 # ⚠️ 构建这台机器需要能访问 npm registry 和 github.com(仅构建时一次性需要)
 FROM node:24-slim
 
+# 0) 版本号入参:CI 传入具体 Claude Code 版本,本地构建默认 latest
+#    镜像 tag 与此版本号统一(见 .github/workflows/build.yml)
+ARG CC_VERSION=latest
+LABEL org.opencontainers.image.title="cc-docker" \
+      org.opencontainers.image.description="预装 Claude Code + plugins 的 CI 镜像" \
+      org.opencontainers.image.source="https://github.com/methol/cc-docker" \
+      org.opencontainers.image.version="${CC_VERSION}"
+
 # 1) plugin clone 依赖 git;ca-certificates/curl/bash 常备
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git curl ca-certificates bash \
     && rm -rf /var/lib/apt/lists/*
 
-# 2) 安装 Claude Code CLI
-RUN npm install -g @anthropic-ai/claude-code
+# 2) 安装 Claude Code CLI(钉死到 CI 传入的版本,保证镜像内版本 = 镜像 tag)
+RUN npm install -g @anthropic-ai/claude-code@${CC_VERSION}
 
 # 3) 固定 HOME,保证「构建期安装位置」与「运行期读取位置」一致(关键)
 ENV HOME=/root
