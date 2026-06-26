@@ -75,10 +75,17 @@ RUN git clone --depth 1 --filter=blob:none --sparse \
     && codex plugin marketplace add /root/.codex/openai-plugins \
     && codex plugin add codex-security@openai-security
 
-# 7) 构建期自检:CLI 可调用 + codex-security 插件已安装启用
+# 7) 安装 andrej-karpathy-skills 插件(第三方,forrestchang/andrej-karpathy-skills)
+#    marketplace 名称 karpathy-skills 不保留,可直接通过 GitHub 地址注册并安装。
+#    安装后克隆目录保留在 /root/.codex/.tmp/marketplaces/karpathy-skills(CODEX_HOME 内)。
+RUN codex plugin marketplace add forrestchang/andrej-karpathy-skills \
+    && codex plugin add andrej-karpathy-skills@karpathy-skills
+
+# 8) 构建期自检:CLI 可调用 + 两个插件均已安装启用
 RUN codex --version && \
     codex plugin list | grep -q "codex-security" && \
-    echo "✅ codex CLI + codex-security plugin ready"
+    codex plugin list | grep -q "andrej-karpathy-skills" && \
+    echo "✅ codex CLI + codex-security + andrej-karpathy-skills ready"
 
 # TMPDIR:security-diff-scan 的 scan bundle 写入位置
 ENV TMPDIR=/tmp
